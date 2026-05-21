@@ -6,8 +6,11 @@ import { createHomeRouter } from './routes/homeRoutes'
 export function createApp(): Express {
     const app = express()
 
-    const viewsPath = path.join(__dirname, 'views')
-    const publicPath = path.join(__dirname, 'public')
+    const projectRoot = process.cwd()
+    const viewsPath = path.join(projectRoot, 'src', 'views')
+    const publicPath = path.join(projectRoot,'src', 'public')
+    const govukFrontendPath = path.join(projectRoot, 'node_modules', 'govuk-frontend', 'dist', 'govuk')
+    const govukAssetsPath = path.join(govukFrontendPath, 'assets')
 
     nunjucks.configure(viewsPath, {
         autoescape: true,
@@ -19,7 +22,10 @@ export function createApp(): Express {
 
     app.use(express.urlencoded({ extended: false }))
     app.use(express.json())
+
     app.use('/public', express.static(publicPath))
+    app.use('/govuk', express.static(govukFrontendPath))
+    app.use('/assets', express.static(govukAssetsPath))
 
     app.use(createHomeRouter())
 

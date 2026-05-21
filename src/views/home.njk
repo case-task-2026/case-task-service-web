@@ -1,24 +1,37 @@
-<!DOCTYPE html>
-<html lang="en" class="govuk-template">
-  <head>
-    <meta charset="utf-8">
-    <title>{{ pageTitle }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-  </head>
+{% extends "layout.njk" %}
 
-  <body class="govuk-template__body">
-    <main class="govuk-main-wrapper" id="main-content">
-      <div class="govuk-width-container">
-        <h1>{{ pageTitle }}</h1>
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
 
-        <p>
-          Use this service to create, view, update and delete caseworker tasks.
-        </p>
+      <p class="govuk-body-l">
+        Create, view, update and delete caseworker tasks in one place.
+      </p>
 
-        <p>
-          Frontend skeleton is running successfully.
-        </p>
+      <p class="govuk-body">
+        This frontend consumes the Case Task Service API and provides a simple web interface for managing tasks.
+      </p>
+
+      <div class="govuk-button-group">
+        <a href="/tasks" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+          View tasks
+        </a>
+
+        <a href="/tasks/new" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+          Create a task
+        </a>
       </div>
-    </main>
-  </body>
-</html>
+
+      <h2 class="govuk-heading-m">What you can do</h2>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>Create a task with a title, optional description and due date/time</li>
+        <li>View all tasks in due date order</li>
+        <li>Update task details</li>
+        <li>Update task status</li>
+        <li>Delete tasks that are no longer needed</li>
+      </ul>
+    </div>
+  </div>
+{% endblock %}

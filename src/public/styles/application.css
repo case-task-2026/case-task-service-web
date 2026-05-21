@@ -1,0 +1,13 @@
+.app-status-tag {
+    white-space: nowrap;
+}
+
+.app-task-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.app-secondary-text {
+    color: #505a5f;
+}
