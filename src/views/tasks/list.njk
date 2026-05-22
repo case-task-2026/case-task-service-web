@@ -1,0 +1,94 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+
+      {% if errorMessage %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem with the task service
+            </h2>
+            <div class="govuk-error-summary__body">
+              <p class="govuk-body">
+                {{ errorMessage }}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="govuk-button-group">
+        <a href="/tasks/new" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+          Create a task
+        </a>
+      </div>
+
+      {% if tasks.length > 0 %}
+        <p class="govuk-body app-secondary-text">
+          {{ taskCount }} task{% if taskCount != 1 %}s{% endif %} found.
+        </p>
+
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--m">
+            Caseworker tasks
+          </caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Task</th>
+              <th scope="col" class="govuk-table__header">Status</th>
+              <th scope="col" class="govuk-table__header">Due</th>
+              <th scope="col" class="govuk-table__header">Created</th>
+              <th scope="col" class="govuk-table__header">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for task in tasks %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                  <a href="/tasks/{{ task.id }}" class="govuk-link">
+                    {{ task.title }}
+                  </a>
+
+                  {% if task.description %}
+                    <div class="govuk-body-s app-secondary-text">
+                      {{ task.description }}
+                    </div>
+                  {% endif %}
+                </td>
+
+                <td class="govuk-table__cell">
+                  <strong class="{{ task.statusTagClass }}">
+                    {{ task.statusText }}
+                  </strong>
+                </td>
+
+                <td class="govuk-table__cell">
+                  {{ task.dueDateTimeText }}
+                </td>
+
+                <td class="govuk-table__cell">
+                  {{ task.createdAtText }}
+                </td>
+
+                <td class="govuk-table__cell">
+                  <a href="/tasks/{{ task.id }}" class="govuk-link">
+                    View
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        {% if not errorMessage %}
+          <div class="govuk-inset-text">
+            There are no tasks yet. Create a task to get started.
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
