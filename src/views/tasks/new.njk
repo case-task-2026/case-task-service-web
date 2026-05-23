@@ -1,0 +1,154 @@
+{% extends "layout.njk" %}
+
+{% block beforeContent %}
+  <a href="/tasks" class="govuk-back-link">Back to tasks</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if errors and errors.length > 0 %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+              <ul class="govuk-list govuk-error-summary__list">
+                {% for error in errors %}
+                  <li>
+                    <a href="#{{ error.field }}">{{ error.message }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if serviceErrorMessage %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem with the task service
+            </h2>
+            <div class="govuk-error-summary__body">
+              <p class="govuk-body">
+                {{ serviceErrorMessage }}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+
+      <form method="post" action="/tasks/new" novalidate>
+        <div class="govuk-form-group {% if fieldErrors.title %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label govuk-label--m" for="title">
+            Task title
+          </label>
+          <div id="title-hint" class="govuk-hint">
+            Enter a short description of the task.
+          </div>
+
+          {% if fieldErrors.title %}
+            <p id="title-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ fieldErrors.title }}
+            </p>
+          {% endif %}
+
+          <input
+            class="govuk-input {% if fieldErrors.title %}govuk-input--error{% endif %}"
+            id="title"
+            name="title"
+            type="text"
+            value="{{ form.title }}"
+            aria-describedby="title-hint{% if fieldErrors.title %} title-error{% endif %}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if fieldErrors.description %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label govuk-label--m" for="description">
+            Description
+          </label>
+          <div id="description-hint" class="govuk-hint">
+            You can add extra details if needed.
+          </div>
+
+          {% if fieldErrors.description %}
+            <p id="description-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ fieldErrors.description }}
+            </p>
+          {% endif %}
+
+          <textarea
+            class="govuk-textarea {% if fieldErrors.description %}govuk-textarea--error{% endif %}"
+            id="description"
+            name="description"
+            rows="5"
+            aria-describedby="description-hint{% if fieldErrors.description %} description-error{% endif %}"
+          >{{ form.description }}</textarea>
+        </div>
+
+        <div class="govuk-form-group {% if fieldErrors.dueDate %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label govuk-label--m" for="dueDate">
+            Due date
+          </label>
+          <div id="dueDate-hint" class="govuk-hint">
+            For example, 2026-06-12.
+          </div>
+
+          {% if fieldErrors.dueDate %}
+            <p id="dueDate-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ fieldErrors.dueDate }}
+            </p>
+          {% endif %}
+
+          <input
+            class="govuk-input govuk-input--width-10 {% if fieldErrors.dueDate %}govuk-input--error{% endif %}"
+            id="dueDate"
+            name="dueDate"
+            type="date"
+            value="{{ form.dueDate }}"
+            aria-describedby="dueDate-hint{% if fieldErrors.dueDate %} dueDate-error{% endif %}"
+          >
+        </div>
+
+        <div class="govuk-form-group {% if fieldErrors.dueTime %}govuk-form-group--error{% endif %}">
+          <label class="govuk-label govuk-label--m" for="dueTime">
+            Due time
+          </label>
+          <div id="dueTime-hint" class="govuk-hint">
+            For example, 16:30.
+          </div>
+
+          {% if fieldErrors.dueTime %}
+            <p id="dueTime-error" class="govuk-error-message">
+              <span class="govuk-visually-hidden">Error:</span> {{ fieldErrors.dueTime }}
+            </p>
+          {% endif %}
+
+          <input
+            class="govuk-input govuk-input--width-5 {% if fieldErrors.dueTime %}govuk-input--error{% endif %}"
+            id="dueTime"
+            name="dueTime"
+            type="time"
+            value="{{ form.dueTime }}"
+            aria-describedby="dueTime-hint{% if fieldErrors.dueTime %} dueTime-error{% endif %}"
+          >
+        </div>
+
+        <div class="govuk-button-group">
+          <button type="submit" class="govuk-button" data-module="govuk-button">
+            Create task
+          </button>
+
+          <a class="govuk-link" href="/tasks">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
