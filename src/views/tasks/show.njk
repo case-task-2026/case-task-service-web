@@ -1,0 +1,127 @@
+{% extends "layout.njk" %}
+
+{% block beforeContent %}
+  <a href="/tasks" class="govuk-back-link">Back to tasks</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if notFoundMessage %}
+        <h1 class="govuk-heading-xl">Task not found</h1>
+
+        <p class="govuk-body">
+          {{ notFoundMessage }}
+        </p>
+
+        <p class="govuk-body">
+          <a href="/tasks" class="govuk-link">Return to the task list</a>.
+        </p>
+      {% elseif serviceErrorMessage %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem with the task service
+            </h2>
+            <div class="govuk-error-summary__body">
+              <p class="govuk-body">
+                {{ serviceErrorMessage }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="govuk-heading-xl">Task details unavailable</h1>
+
+        <p class="govuk-body">
+          <a href="/tasks" class="govuk-link">Return to the task list</a>.
+        </p>
+      {% else %}
+        <span class="{{ task.statusTagClass }}">
+          {{ task.statusText }}
+        </span>
+
+        <h1 class="govuk-heading-xl govuk-!-margin-top-3">
+          {{ task.title }}
+        </h1>
+
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Description
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if task.description %}
+                {{ task.description }}
+              {% else %}
+                <span class="app-secondary-text">No description provided</span>
+              {% endif %}
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Status
+            </dt>
+            <dd class="govuk-summary-list__value">
+              <strong class="{{ task.statusTagClass }}">
+                {{ task.statusText }}
+              </strong>
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/tasks/{{ task.id }}/status">
+                Change<span class="govuk-visually-hidden"> status</span>
+              </a>
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Due
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ task.dueDateTimeText }}
+            </dd>
+            <dd class="govuk-summary-list__actions">
+              <a class="govuk-link" href="/tasks/{{ task.id }}/edit">
+                Change<span class="govuk-visually-hidden"> due date and task details</span>
+              </a>
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Created
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ task.createdAtText }}
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Last updated
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ task.updatedAtText }}
+            </dd>
+          </div>
+        </dl>
+
+        <div class="govuk-button-group">
+          <a href="/tasks/{{ task.id }}/edit" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+            Update task
+          </a>
+
+          <a href="/tasks/{{ task.id }}/status" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            Update status
+          </a>
+
+          <a href="/tasks/{{ task.id }}/delete" class="govuk-link govuk-link--no-visited-state">
+            Delete task
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

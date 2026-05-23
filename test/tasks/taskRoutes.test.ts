@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { createApp } from '../../src/app'
-import { TaskApiClient } from '../../src/tasks/taskApiClient'
+import { TaskApiClient, TaskApiError } from '../../src/tasks/taskApiClient'
 import {
   CreateTaskPayload,
   Task,
@@ -60,7 +60,7 @@ describe('task routes', () => {
     expect(response.text).toContain('Create a task')
   })
 
-  it('renders service error when API client fails', async () => {
+  it('renders service error when API client fails on task list', async () => {
     const taskApiClient = createFakeTaskApiClient({
       getTasks: jest.fn().mockRejectedValue(new Error('Backend unavailable'))
     })
@@ -169,6 +169,77 @@ describe('task routes', () => {
     expect(response.text).toContain('There is a problem with the task service')
     expect(response.text).toContain('The task could not be created')
     expect(response.text).toContain('Created task')
+  })
+
+  it('renders task details page', async () => {
+    const task = buildTask({
+      id: '44444444-4444-4444-4444-444444444444',
+      title: 'Review evidence',
+      description: 'Check documents before hearing',
+      status: 'IN_PROGRESS'
+    })
+
+    const getTask = jest.fn().mockResolvedValue(task)
+    const taskApiClient = createFakeTaskApiClient({
+      getTask
+    })
+
+    const app = createApp({ taskApiClient })
+
+    const response = await request(app)
+      .get('/tasks/44444444-4444-4444-4444-444444444444')
+      .expect(200)
+
+    expect(getTask).toHaveBeenCalledWith('44444444-4444-4444-4444-444444444444')
+    expect(response.text).toContain('Review evidence')
+    expect(response.text).toContain('Check documents before hearing')
+    expect(response.text).toContain('In progress')
+    expect(response.text).toContain('Due')
+    expect(response.text).toContain('Last updated')
+    expect(response.text).toContain('/tasks/44444444-4444-4444-4444-444444444444/edit')
+    expect(response.text).toContain('/tasks/44444444-4444-4444-4444-444444444444/status')
+    expect(response.text).toContain('/tasks/44444444-4444-4444-4444-444444444444/delete')
+  })
+
+  it('renders task not found page', async () => {
+    const taskId = '55555555-5555-5555-5555-555555555555'
+    const getTask = jest.fn().mockRejectedValue(
+      new TaskApiError({
+        status: 404,
+        error: 'Not Found',
+        message: `Task with id '${taskId}' was not found`,
+        path: `/tasks/${taskId}`
+      })
+    )
+
+    const taskApiClient = createFakeTaskApiClient({
+      getTask
+    })
+
+    const app = createApp({ taskApiClient })
+
+    const response = await request(app)
+      .get(`/tasks/${taskId}`)
+      .expect(404)
+
+    expect(response.text).toContain('Task not found')
+    expect(response.text).toContain(`Task with id &#39;${taskId}&#39; was not found`)
+    expect(response.text).toContain('Return to the task list')
+  })
+
+  it('renders service error when API client fails on task details', async () => {
+    const taskApiClient = createFakeTaskApiClient({
+      getTask: jest.fn().mockRejectedValue(new Error('Backend unavailable'))
+    })
+
+    const app = createApp({ taskApiClient })
+
+    const response = await request(app)
+      .get('/tasks/66666666-6666-6666-6666-666666666666')
+      .expect(502)
+
+    expect(response.text).toContain('There is a problem with the task service')
+    expect(response.text).toContain('The task details could not be loaded')
   })
 
   function createFakeTaskApiClient(overrides: Partial<TaskApiClient> = {}): TaskApiClient {

@@ -8,7 +8,10 @@ import {
   toCreateTaskPayload,
   validateCreateTaskForm
 } from '../tasks/taskForms'
-import { toTaskListItemViewModel } from '../tasks/taskViewModels'
+import {
+  toTaskDetailsViewModel,
+  toTaskListItemViewModel
+} from '../tasks/taskViewModels'
 
 const EMPTY_CREATE_TASK_FORM: CreateTaskForm = {
   title: '',
@@ -83,6 +86,32 @@ export function createTaskRouter(taskApiClient: TaskApiClient): Router {
           serviceErrorMessage: 'The task could not be created because the task API could not be reached.'
         }
       )
+    }
+  })
+
+  router.get('/tasks/:taskId', async (request, response) => {
+    const taskId = request.params.taskId
+
+    try {
+      const task = await taskApiClient.getTask(taskId)
+      const taskViewModel = toTaskDetailsViewModel(task)
+
+      return response.render('tasks/show.njk', {
+        pageTitle: taskViewModel.title,
+        task: taskViewModel
+      })
+    } catch (error) {
+      if (error instanceof TaskApiError && error.status === 404) {
+        return response.status(404).render('tasks/show.njk', {
+          pageTitle: 'Task not found',
+          notFoundMessage: error.message
+        })
+      }
+
+      return response.status(502).render('tasks/show.njk', {
+        pageTitle: 'Task details unavailable',
+        serviceErrorMessage: 'The task details could not be loaded because the task API could not be reached.'
+      })
     }
   })
 

@@ -1,4 +1,8 @@
-import { formatIsoDateTime, toTaskListItemViewModel } from '../../src/tasks/taskViewModels'
+import {
+  formatIsoDateTime,
+  toTaskDetailsViewModel,
+  toTaskListItemViewModel
+} from '../../src/tasks/taskViewModels'
 import { Task } from '../../src/tasks/taskTypes'
 
 describe('taskViewModels', () => {
@@ -20,6 +24,29 @@ describe('taskViewModels', () => {
 
     expect(viewModel.dueDateTimeText).toContain('12 Jun 2026')
     expect(viewModel.createdAtText).toContain('14 May 2026')
+  })
+
+  it('maps task to details view model', () => {
+    const task = buildTask({
+      id: '22222222-2222-2222-2222-222222222222',
+      title: 'Review evidence',
+      description: null,
+      status: 'COMPLETED',
+      updatedAt: '2026-05-15T10:45:00Z'
+    })
+
+    const viewModel = toTaskDetailsViewModel(task)
+
+    expect(viewModel).toMatchObject({
+      id: '22222222-2222-2222-2222-222222222222',
+      title: 'Review evidence',
+      description: null,
+      status: 'COMPLETED',
+      statusText: 'Completed',
+      statusTagClass: 'govuk-tag govuk-tag--green app-status-tag'
+    })
+
+    expect(viewModel.updatedAtText).toContain('15 May 2026')
   })
 
   it('maps IN_PROGRESS status display', () => {

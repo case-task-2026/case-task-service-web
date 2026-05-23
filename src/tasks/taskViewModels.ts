@@ -11,6 +11,18 @@ export interface TaskListItemViewModel {
   readonly createdAtText: string
 }
 
+export interface TaskDetailsViewModel {
+  readonly id: string
+  readonly title: string
+  readonly description: string | null
+  readonly status: TaskStatus
+  readonly statusText: string
+  readonly statusTagClass: string
+  readonly dueDateTimeText: string
+  readonly createdAtText: string
+  readonly updatedAtText: string
+}
+
 interface TaskStatusDisplay {
   readonly text: string
   readonly tagClass: string
@@ -49,6 +61,22 @@ export function toTaskListItemViewModel(task: Task): TaskListItemViewModel {
     statusTagClass: statusDisplay.tagClass,
     dueDateTimeText: formatIsoDateTime(task.dueDateTime),
     createdAtText: formatIsoDateTime(task.createdAt)
+  }
+}
+
+export function toTaskDetailsViewModel(task: Task): TaskDetailsViewModel {
+  const statusDisplay = TASK_STATUS_DISPLAY[task.status]
+
+  return {
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    statusText: statusDisplay.text,
+    statusTagClass: statusDisplay.tagClass,
+    dueDateTimeText: formatIsoDateTime(task.dueDateTime),
+    createdAtText: formatIsoDateTime(task.createdAt),
+    updatedAtText: formatIsoDateTime(task.updatedAt)
   }
 }
 
