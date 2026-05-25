@@ -1,0 +1,110 @@
+{% extends "layout.njk" %}
+
+{% block beforeContent %}
+  <a href="/tasks/{{ taskId }}" class="govuk-back-link">Back to task</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if notFoundMessage %}
+        <h1 class="govuk-heading-xl">Task not found</h1>
+
+        <p class="govuk-body">
+          {{ notFoundMessage }}
+        </p>
+
+        <p class="govuk-body">
+          <a href="/tasks" class="govuk-link">Return to the task list</a>.
+        </p>
+      {% elseif serviceErrorMessage %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem with the task service
+            </h2>
+            <div class="govuk-error-summary__body">
+              <p class="govuk-body">
+                {{ serviceErrorMessage }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="govuk-heading-xl">Delete task unavailable</h1>
+
+        <p class="govuk-body">
+          <a href="/tasks" class="govuk-link">Return to the task list</a>.
+        </p>
+      {% else %}
+        <h1 class="govuk-heading-xl">
+          Are you sure you want to delete this task?
+        </h1>
+
+        <div class="govuk-warning-text">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">Warning</span>
+            This action cannot be undone.
+          </strong>
+        </div>
+
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Task
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ task.title }}
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Description
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {% if task.description %}
+                {{ task.description }}
+              {% else %}
+                <span class="app-secondary-text">No description provided</span>
+              {% endif %}
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Status
+            </dt>
+            <dd class="govuk-summary-list__value">
+              <strong class="{{ task.statusTagClass }}">
+                {{ task.statusText }}
+              </strong>
+            </dd>
+          </div>
+
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Due
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ task.dueDateTimeText }}
+            </dd>
+          </div>
+        </dl>
+
+        <form method="post" action="/tasks/{{ task.id }}/delete">
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">
+              Delete task
+            </button>
+
+            <a class="govuk-link" href="/tasks/{{ task.id }}">
+              Cancel
+            </a>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

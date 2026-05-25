@@ -264,6 +264,54 @@ export function createTaskRouter(taskApiClient: TaskApiClient): Router {
     }
   })
 
+  router.get('/tasks/:taskId/delete', async (request, response) => {
+    const taskId = request.params.taskId
+
+    try {
+      const task = await taskApiClient.getTask(taskId)
+      const taskViewModel = toTaskDetailsViewModel(task)
+
+      return renderDeleteTaskConfirmation(response, {
+        taskId,
+        task: taskViewModel
+      })
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return renderDeleteTaskConfirmation(response.status(404), {
+          taskId,
+          notFoundMessage: error.message
+        })
+      }
+
+      return renderDeleteTaskConfirmation(response.status(502), {
+        taskId,
+        serviceErrorMessage: 'The task could not be loaded because the task API could not be reached.'
+      })
+    }
+  })
+
+  router.post('/tasks/:taskId/delete', async (request, response) => {
+    const taskId = request.params.taskId
+
+    try {
+      await taskApiClient.deleteTask(taskId)
+
+      return response.redirect('/tasks')
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return renderDeleteTaskConfirmation(response.status(404), {
+          taskId,
+          notFoundMessage: error.message
+        })
+      }
+
+      return renderDeleteTaskConfirmation(response.status(502), {
+        taskId,
+        serviceErrorMessage: 'The task could not be deleted because the task API could not be reached.'
+      })
+    }
+  })
+
   return router
 }
 
@@ -286,6 +334,13 @@ interface UpdateTaskStatusFormPageModel {
   readonly taskTitle?: string
   readonly form: UpdateTaskStatusForm
   readonly errors: FormFieldError[]
+  readonly notFoundMessage?: string
+  readonly serviceErrorMessage?: string
+}
+
+interface DeleteTaskConfirmationPageModel {
+  readonly taskId: string
+  readonly task?: ReturnType<typeof toTaskDetailsViewModel>
   readonly notFoundMessage?: string
   readonly serviceErrorMessage?: string
 }
@@ -320,6 +375,19 @@ function renderUpdateTaskStatusForm(response: Response, model: UpdateTaskStatusF
     form: model.form,
     errors: model.errors,
     fieldErrors: buildFieldErrorMap(model.errors, ['status']),
+    notFoundMessage: model.notFoundMessage,
+    serviceErrorMessage: model.serviceErrorMessage
+  })
+}
+
+function renderDeleteTaskConfirmation(
+  response: Response,
+  model: DeleteTaskConfirmationPageModel
+): void {
+  response.render('tasks/delete.njk', {
+    pageTitle: 'Delete task',
+    taskId: model.taskId,
+    task: model.task,
     notFoundMessage: model.notFoundMessage,
     serviceErrorMessage: model.serviceErrorMessage
   })
