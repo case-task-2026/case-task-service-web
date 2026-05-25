@@ -39,17 +39,31 @@
           <nav aria-label="Menu" class="govuk-header__navigation">
             <ul class="govuk-header__navigation-list">
               <li class="govuk-header__navigation-item">
-                <a class="govuk-header__link" href="/">
+                <a
+                  class="govuk-header__link {% if navigation.home %}app-header-navigation-link--active{% endif %}"
+                  href="/"
+                  {% if navigation.home %}aria-current="page"{% endif %}
+                >
                   Home
                 </a>
               </li>
+
               <li class="govuk-header__navigation-item">
-                <a class="govuk-header__link" href="/tasks">
+                <a
+                  class="govuk-header__link {% if navigation.tasks %}app-header-navigation-link--active{% endif %}"
+                  href="/tasks"
+                  {% if navigation.tasks %}aria-current="page"{% endif %}
+                >
                   Tasks
                 </a>
               </li>
+
               <li class="govuk-header__navigation-item">
-                <a class="govuk-header__link" href="/tasks/new">
+                <a
+                  class="govuk-header__link {% if navigation.createTask %}app-header-navigation-link--active{% endif %}"
+                  href="/tasks/new"
+                  {% if navigation.createTask %}aria-current="page"{% endif %}
+                >
                   Create task
                 </a>
               </li>

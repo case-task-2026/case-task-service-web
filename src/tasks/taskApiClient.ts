@@ -37,6 +37,19 @@ export class TaskApiError extends Error {
   }
 }
 
+export class TaskApiConnectionError extends Error {
+  readonly baseUrl: string
+  readonly originalError: unknown
+
+  constructor(baseUrl: string, originalError: unknown) {
+    super(`The task API could not be reached at ${baseUrl}`)
+
+    this.name = 'TaskApiConnectionError'
+    this.baseUrl = baseUrl
+    this.originalError = originalError
+  }
+}
+
 export class HttpTaskApiClient implements TaskApiClient {
   private readonly baseUrl: string
   private readonly fetchFunction: typeof fetch
@@ -86,14 +99,20 @@ export class HttpTaskApiClient implements TaskApiClient {
   }
 
   private async request<T>(path: string, init: RequestInit): Promise<T> {
-    const response = await this.fetchFunction(`${this.baseUrl}${path}`, {
-      ...init,
-      headers: {
-        Accept: 'application/json',
-        ...(init.body ? { 'Content-Type': 'application/json' } : {}),
-        ...init.headers
-      }
-    })
+    let response: Response
+
+    try {
+      response = await this.fetchFunction(`${this.baseUrl}${path}`, {
+        ...init,
+        headers: {
+          Accept: 'application/json',
+          ...(init.body ? { 'Content-Type': 'application/json' } : {}),
+          ...init.headers
+        }
+      })
+    } catch (error) {
+      throw new TaskApiConnectionError(this.baseUrl, error)
+    }
 
     if (!response.ok) {
       throw await this.toTaskApiError(response)

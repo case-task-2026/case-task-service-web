@@ -11,3 +11,10 @@
 .app-secondary-text {
     color: #505a5f;
 }
+
+.app-header-navigation-link--active {
+  display: inline-block;
+  font-weight: 700;
+  box-shadow: inset 0 -4px 0 #ffffff;
+  padding-bottom: 4px;
+}

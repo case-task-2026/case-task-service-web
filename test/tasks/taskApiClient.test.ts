@@ -1,4 +1,8 @@
-import { HttpTaskApiClient, TaskApiError } from '../../src/tasks/taskApiClient'
+import {
+    HttpTaskApiClient,
+    TaskApiConnectionError,
+    TaskApiError
+} from '../../src/tasks/taskApiClient'
 import { CreateTaskPayload, Task } from '../../src/tasks/taskTypes'
 
 describe('HttpTaskApiClient', () => {
@@ -223,6 +227,25 @@ describe('HttpTaskApiClient', () => {
         status: 500,
         error: 'Internal Server Error',
         message: 'The task service request failed'
+      })
+    }
+  })
+
+  it('throws TaskApiConnectionError when fetch fails before receiving a response', async () => {
+    const originalError = new Error('ECONNREFUSED')
+    const fetchFunction = jest.fn().mockRejectedValue(originalError)
+
+    const client = new HttpTaskApiClient(baseUrl, fetchFunction)
+
+    try {
+      await client.getTasks()
+      throw new Error('Expected client.getTasks() to throw')
+    } catch (error) {
+      expect(error).toBeInstanceOf(TaskApiConnectionError)
+      expect(error).toMatchObject({
+        name: 'TaskApiConnectionError',
+        baseUrl,
+        originalError
       })
     }
   })
