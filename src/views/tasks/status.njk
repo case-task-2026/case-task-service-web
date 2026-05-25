@@ -1,0 +1,108 @@
+{% extends "layout.njk" %}
+
+{% block beforeContent %}
+  <a href="/tasks/{{ taskId }}" class="govuk-back-link">Back to task</a>
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if notFoundMessage %}
+        <h1 class="govuk-heading-xl">Task not found</h1>
+        <p class="govuk-body">{{ notFoundMessage }}</p>
+        <p class="govuk-body">
+          <a href="/tasks" class="govuk-link">Return to the task list</a>.
+        </p>
+      {% elseif serviceErrorMessage %}
+        <div class="govuk-error-summary" data-module="govuk-error-summary">
+          <div role="alert">
+            <h2 class="govuk-error-summary__title">
+              There is a problem with the task service
+            </h2>
+            <div class="govuk-error-summary__body">
+              <p class="govuk-body">{{ serviceErrorMessage }}</p>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+      {% else %}
+        {% if errors and errors.length > 0 %}
+          <div class="govuk-error-summary" data-module="govuk-error-summary">
+            <div role="alert">
+              <h2 class="govuk-error-summary__title">
+                There is a problem
+              </h2>
+              <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                  {% for error in errors %}
+                    <li>
+                      <a href="#{{ error.field }}">{{ error.message }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+        <form method="post" action="/tasks/{{ taskId }}/status" novalidate>
+          <div class="govuk-form-group {% if fieldErrors.status %}govuk-form-group--error{% endif %}">
+            <fieldset class="govuk-fieldset" aria-describedby="{% if fieldErrors.status %}status-error{% endif %}">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                <h1 class="govuk-fieldset__heading">
+                  {{ pageTitle }}
+                </h1>
+              </legend>
+
+              {% if taskTitle %}
+                <p class="govuk-body">
+                  Task: <strong>{{ taskTitle }}</strong>
+                </p>
+              {% endif %}
+
+              {% if fieldErrors.status %}
+                <p id="status-error" class="govuk-error-message">
+                  <span class="govuk-visually-hidden">Error:</span> {{ fieldErrors.status }}
+                </p>
+              {% endif %}
+
+              <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="status" name="status" type="radio" value="TODO" {% if form.status == "TODO" %}checked{% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="status">
+                    To do
+                  </label>
+                </div>
+
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="status-2" name="status" type="radio" value="IN_PROGRESS" {% if form.status == "IN_PROGRESS" %}checked{% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="status-2">
+                    In progress
+                  </label>
+                </div>
+
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="status-3" name="status" type="radio" value="COMPLETED" {% if form.status == "COMPLETED" %}checked{% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="status-3">
+                    Completed
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+              Save status
+            </button>
+
+            <a class="govuk-link" href="/tasks/{{ taskId }}">
+              Cancel
+            </a>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
