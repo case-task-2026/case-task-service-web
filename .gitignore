@@ -2,6 +2,9 @@ node_modules/
 dist/
 coverage/
 
+.idea/
+*.iml
+
 .env
 .env.*
 !.env.example
